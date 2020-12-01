@@ -3,6 +3,7 @@ package edu.uoc.pac3.oauth
 import android.net.Network
 import android.net.Uri
 import android.os.Bundle
+import android.se.omapi.Session
 import android.util.Log
 import android.view.View
 import android.webkit.WebResourceRequest
@@ -10,10 +11,12 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import edu.uoc.pac3.R
+import edu.uoc.pac3.data.SessionManager
 import edu.uoc.pac3.data.TwitchApiService
 import edu.uoc.pac3.data.network.Endpoints
 import edu.uoc.pac3.data.network.Network.createHttpClient
 import edu.uoc.pac3.data.oauth.OAuthConstants
+import edu.uoc.pac3.data.oauth.OAuthTokensResponse
 import kotlinx.android.synthetic.main.activity_oauth.*
 import java.util.*
 
@@ -24,6 +27,7 @@ class OAuthActivity : AppCompatActivity() {
 
     private val TAG = "OAuthActivity"
     private val uniqueState = UUID.randomUUID().toString()
+    private val sessionManager: SessionManager = SessionManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,12 +88,15 @@ class OAuthActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
 
         val twitchService :TwitchApiService = TwitchApiService(createHttpClient(this))
+        var token: OAuthTokensResponse? = null
+
         GlobalScope.launch {
-            var token = twitchService.getTokens(authorizationCode)
+            token = twitchService.getTokens(authorizationCode)
             Log.d(TAG, "Here is the authorization code! $token")
         }
 
-        // TODO: Save access token and refresh token using the SessionManager class
+        token?.accessToken?.let { sessionManager.saveAccessToken(it) }
+        token?.refreshToken?.let { sessionManager.saveRefreshToken(it) }
 
     }
 }
