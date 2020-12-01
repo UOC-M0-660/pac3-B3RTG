@@ -4,6 +4,7 @@ import android.content.Context
 
 /**
  * Created by alex on 06/09/2020.
+ * Modified by albert on 01/12/2020
  */
 
 class SessionManager(context: Context) {

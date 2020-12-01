@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 /**
  * Created by alex on 07/09/2020.
+ * Modified by albert on 01/12/2020
  */
 @Serializable
 data class OAuthTokensResponse(

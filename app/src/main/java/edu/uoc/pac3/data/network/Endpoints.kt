@@ -2,6 +2,7 @@ package edu.uoc.pac3.data.network
 
 /**
  * Created by alex on 07/09/2020.
+ * Modified by albert on 01/12/2020
  */
 object Endpoints {
 
