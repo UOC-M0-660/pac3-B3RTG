@@ -1,42 +1,67 @@
 package edu.uoc.pac3.data
 
 import android.content.Context
+import android.util.Log
+import edu.uoc.pac3.R
+import io.ktor.utils.io.concurrent.shared
 
 /**
  * Created by alex on 06/09/2020.
  * Modified by albert on 01/12/2020
  */
 
-class SessionManager(context: Context) {
+class SessionManager(private val context: Context) {
+
+    private val preferencesKey: String = context?.getString(R.string.preference_file_key)
+    private val refreshTokenKey: String = context?.getString(R.string.refresh_token_token_key)
+    private val accessTokenKey: String = context?.getString(R.string.access_token_key)
 
     fun isUserAvailable(): Boolean {
-        // TODO: Implement
-        return false
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE) ?: return false
+        return sharedPreferences.contains(refreshTokenKey) && sharedPreferences.contains(accessTokenKey)
     }
 
     fun getAccessToken(): String? {
-        // TODO: Implement
-        return null
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE)
+        return sharedPreferences?.getString(accessTokenKey, "")
     }
 
     fun saveAccessToken(accessToken: String) {
-        TODO("Save Access Token")
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE) ?: return
+        with (sharedPreferences?.edit()) {
+            putString(accessTokenKey, accessToken)
+            commit()
+        }
     }
 
     fun clearAccessToken() {
-        TODO("Clear Access Token")
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE) ?: return
+        with (sharedPreferences?.edit()) {
+            remove(accessTokenKey)
+            commit()
+        }
     }
 
     fun getRefreshToken(): String? {
-        TODO("Get Refresh Token")
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE)
+        return sharedPreferences?.getString(refreshTokenKey, "")
     }
 
     fun saveRefreshToken(refreshToken: String) {
-        TODO("Save Refresh Token")
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE) ?: return
+        with (sharedPreferences?.edit()) {
+            putString(refreshTokenKey, refreshToken)
+            commit()
+        }
     }
 
     fun clearRefreshToken() {
-        TODO("Clear Refresh Token")
+        var sharedPreferences = context?.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE) ?: return
+        with (sharedPreferences?.edit()) {
+            remove(refreshTokenKey)
+            commit()
+        }
     }
 
 }
+
