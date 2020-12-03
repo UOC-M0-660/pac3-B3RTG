@@ -20,12 +20,12 @@ class StreamsListAdapter(private var streams: List<Stream>) : RecyclerView.Adapt
 
     fun setStreams(newStreams: List<Stream>) {
 
-        //val diffResult = DiffUtil.calculateDiff(StreamsDiffCallback(newStreams,this.streams))
-        //diffResult.dispatchUpdatesTo(this)
+        val diffResult = DiffUtil.calculateDiff(StreamsDiffCallback(newStreams,this.streams))
+        diffResult.dispatchUpdatesTo(this)
 
         // Reloads the RecyclerView with new adapter data
-        this.streams = newStreams
-        notifyDataSetChanged()
+        //this.streams = newStreams
+        //notifyDataSetChanged()
 
     }
 
