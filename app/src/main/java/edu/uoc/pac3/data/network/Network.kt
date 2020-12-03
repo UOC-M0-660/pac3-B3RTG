@@ -60,8 +60,6 @@ object Network {
 
             // Apply to All Requests
             defaultRequest {
-                //parameter("api_key", "some_api_key")
-                // Content Type
                 if (this.method != HttpMethod.Get) contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
 

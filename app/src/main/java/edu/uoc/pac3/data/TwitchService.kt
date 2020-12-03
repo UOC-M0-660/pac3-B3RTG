@@ -50,7 +50,15 @@ class TwitchApiService(private val httpClient: HttpClient) {
                 append("Client-Id", OAuthConstants.clientId)
             }*/
 
+            if(cursor != "")
+            {
+                parameter("first", 20)
+                parameter("after", cursor)
+            }
+
         }
+
+        Log.d(TAG, response.pagination?.cursor)
 
         return response
     }

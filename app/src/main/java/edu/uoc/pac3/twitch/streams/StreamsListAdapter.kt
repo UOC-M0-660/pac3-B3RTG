@@ -17,7 +17,7 @@ class StreamsListAdapter(private var streams: List<Stream>) : RecyclerView.Adapt
         return streams[position]
     }
 
-    fun setBooks(streams: List<Stream>) {
+    fun setStreams(streams: List<Stream>) {
         this.streams = streams
         // Reloads the RecyclerView with new adapter data
         notifyDataSetChanged()
@@ -40,7 +40,7 @@ class StreamsListAdapter(private var streams: List<Stream>) : RecyclerView.Adapt
         val stream = getStream(position)
         holder.titleView.text = stream.title
         holder.authorView.text = stream.userName
-        val imageSize: String = R.dimen.stream_item_image_width_small.toString() + "x" + R.dimen.stream_item_image_width_small.toString()
+        val imageSize: String = R.dimen.stream_item_image_width_small.toString() + "x" + R.dimen.stream_item_image_height.toString()
         Glide.with(holder.view).load(stream.thumbnailUrl?.replace("{width}x{height}",imageSize)).into(holder.thumbView);
     }
 

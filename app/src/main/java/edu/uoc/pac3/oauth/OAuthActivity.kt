@@ -1,7 +1,9 @@
 package edu.uoc.pac3.oauth
 
+import android.content.Intent
 import android.net.Network
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.se.omapi.Session
 import android.util.Log
@@ -9,9 +11,12 @@ import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
+import com.google.android.material.snackbar.Snackbar
+import edu.uoc.pac3.LaunchActivity
 import edu.uoc.pac3.R
 import edu.uoc.pac3.data.SessionManager
 import edu.uoc.pac3.data.TwitchApiService
@@ -19,6 +24,7 @@ import edu.uoc.pac3.data.network.Endpoints
 import edu.uoc.pac3.data.network.Network.createHttpClient
 import edu.uoc.pac3.data.oauth.OAuthConstants
 import edu.uoc.pac3.data.oauth.OAuthTokensResponse
+import edu.uoc.pac3.twitch.streams.StreamsActivity
 import kotlinx.android.synthetic.main.activity_oauth.*
 import java.util.*
 
@@ -38,20 +44,8 @@ class OAuthActivity : AppCompatActivity() {
         //test()
         sessionManager = SessionManager(this)
         launchOAuthAuthorization()
-    }
 
-    fun test() {
-        runBlocking {
-            val job = GlobalScope.launch { // launch a new coroutine and keep a reference to its Job
-                delay(1000L)
-                println("World!")
-            }
-            println("Hello,")
-            job.join() // wait until child coroutine completes
-            println("FINISH!")
-        }
     }
-
 
     fun buildOAuthUri(): Uri {
         return Uri.parse(Endpoints.oauthAuthorizationUrl)
@@ -64,11 +58,16 @@ class OAuthActivity : AppCompatActivity() {
             .build()
     }
 
+    private fun openLaunchActivity()
+    {
+        startActivity(Intent(this, LaunchActivity::class.java))
+        finish()
+    }
+
     private fun launchOAuthAuthorization() {
         //  Create URI
         val uri = buildOAuthUri()
 
-        // TODO: Set webView Redirect Listener
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 request?.let {
@@ -84,7 +83,7 @@ class OAuthActivity : AppCompatActivity() {
                                 onAuthorizationCodeRetrieved(code)
                             } ?: run {
                                 // User cancelled the login flow
-                                // TODO: Handle error
+                                Toast.makeText(applicationContext, "Login error",Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -103,6 +102,7 @@ class OAuthActivity : AppCompatActivity() {
     private fun onAuthorizationCodeRetrieved(authorizationCode: String) {
 
         // Show Loading Indicator
+        webView.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
 
         val twitchService :TwitchApiService = TwitchApiService(createHttpClient(this))
@@ -122,7 +122,9 @@ class OAuthActivity : AppCompatActivity() {
                 Log.d(TAG, "Se acabo, continuamos para bingo")
                 token?.accessToken?.let { sessionManager.saveAccessToken(it) }
                 token?.refreshToken?.let { sessionManager.saveRefreshToken(it) }
+                openLaunchActivity()
             }
         }
+
     }
 }

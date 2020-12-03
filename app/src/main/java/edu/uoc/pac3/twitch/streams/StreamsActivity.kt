@@ -1,11 +1,7 @@
 package edu.uoc.pac3.twitch.streams
 
 import android.os.Bundle
-import android.se.omapi.Session
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
@@ -21,7 +17,7 @@ class StreamsActivity : AppCompatActivity() {
 
     private val TAG = "StreamsActivity"
     private lateinit var adapter: StreamsListAdapter
-
+    private var cursor: String = ""
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
@@ -34,23 +30,31 @@ class StreamsActivity : AppCompatActivity() {
 
         // Init RecyclerView
         initRecyclerView()
+        //get first load
+        getStreamData()
 
+    }
 
-        // TODO: Get Streams
+    private fun getStreamData()
+    {
         val ts = TwitchApiService(Network.createHttpClient(this))
         val sm = SessionManager(this)
 
-       lifecycleScope.launch {
+        lifecycleScope.launch {
             whenStarted {
 
-                var streams = ts.getStreams(sm.getAccessToken().toString())
+                var streams = ts.getStreams(cursor)
+                cursor = streams?.pagination?.cursor!!
+
+                Log.d(TAG, "Next currsor $cursor")
                 Log.d(TAG, "Set streams to adapter")
-                adapter.setBooks(streams?.data!!)
+                adapter.setStreams(streams?.data!!)
             }
         }
-
-
     }
+
+
+
 
     private fun initRecyclerView() {
 
@@ -63,6 +67,18 @@ class StreamsActivity : AppCompatActivity() {
         //Init Adapter
         adapter = StreamsListAdapter(emptyList())
         recyclerview.adapter = adapter
+
+        //scroll listener
+        recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 && !recyclerView.canScrollVertically(1)) {
+                    Log.i(TAG, "FETCH NEW DATA");
+                    getStreamData()
+                } /*else if (dy < 0) {
+                    Log.i(TAG, "SCROLLING UP");
+                }*/
+            }
+        })
     }
 
 }

@@ -13,8 +13,13 @@ data class Stream(
         @SerialName("title") val title: String? = null,
         @SerialName("thumbnail_url") val thumbnailUrl: String?=null,
 )
+@Serializable
+data class Pagination(
+    @SerialName("cursor") val cursor: String? = null
+)
 
 @Serializable
 data class StreamsResponse(
         @SerialName("data") val data: List<Stream>? = null,
+        @SerialName("pagination") val pagination: Pagination? = null
 )

@@ -9,8 +9,9 @@
     <ImageView
         android:id="@+id/stream_thumbnail"
         android:layout_width="@dimen/stream_item_image_width_small"
-        android:layout_height="@dimen/stream_item_image_height"
+        android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
@@ -19,8 +20,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/black"
-        app:layout_constraintLeft_toRightOf="@id/stream_thumbnail"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stream_thumbnail"
         android:layout_margin="@dimen/margin_xsmall"/>
 
 
@@ -30,7 +31,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
         android:textColor="@color/black"
-        app:layout_constraintLeft_toRightOf="@id/stream_thumbnail"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/stream_user"
         android:layout_margin="@dimen/margin_xsmall"/>
 
