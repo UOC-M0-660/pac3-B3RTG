@@ -10,6 +10,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import edu.uoc.pac3.R
 import edu.uoc.pac3.data.SessionManager
 import edu.uoc.pac3.data.TwitchApiService
@@ -27,13 +29,29 @@ class OAuthActivity : AppCompatActivity() {
 
     private val TAG = "OAuthActivity"
     private val uniqueState = UUID.randomUUID().toString()
-    private val sessionManager: SessionManager = SessionManager(this)
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_oauth)
+
+        //test()
+        sessionManager = SessionManager(this)
         launchOAuthAuthorization()
     }
+
+    fun test() {
+        runBlocking {
+            val job = GlobalScope.launch { // launch a new coroutine and keep a reference to its Job
+                delay(1000L)
+                println("World!")
+            }
+            println("Hello,")
+            job.join() // wait until child coroutine completes
+            println("FINISH!")
+        }
+    }
+
 
     fun buildOAuthUri(): Uri {
         return Uri.parse(Endpoints.oauthAuthorizationUrl)
@@ -90,13 +108,21 @@ class OAuthActivity : AppCompatActivity() {
         val twitchService :TwitchApiService = TwitchApiService(createHttpClient(this))
         var token: OAuthTokensResponse? = null
 
-        GlobalScope.launch {
-            token = twitchService.getTokens(authorizationCode)
-            Log.d(TAG, "Here is the authorization code! $token")
+        lifecycleScope.launch {
+            whenStarted {
+
+                val job = GlobalScope.launch {
+                    token = twitchService.getTokens(authorizationCode)
+                    Log.d(TAG, "Here is the authorization code! $token")
+                }
+                Log.d(TAG, "Obteniedo token")
+
+                job.join()
+
+                Log.d(TAG, "Se acabo, continuamos para bingo")
+                token?.accessToken?.let { sessionManager.saveAccessToken(it) }
+                token?.refreshToken?.let { sessionManager.saveRefreshToken(it) }
+            }
         }
-
-        token?.accessToken?.let { sessionManager.saveAccessToken(it) }
-        token?.refreshToken?.let { sessionManager.saveRefreshToken(it) }
-
     }
 }

@@ -11,6 +11,11 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+
+        // for test only
+        //SessionManager(this).clearAccessToken()
+        //SessionManager(this).clearRefreshToken()
+
         checkUserSession()
     }
 
