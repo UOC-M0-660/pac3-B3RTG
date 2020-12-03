@@ -11,6 +11,7 @@ import edu.uoc.pac3.data.streams.StreamsResponse
 import edu.uoc.pac3.data.user.User
 import io.ktor.client.*
 import io.ktor.client.request.*
+import kotlin.jvm.Throws
 
 /**
  * Created by alex on 24/10/2020.
@@ -42,10 +43,12 @@ class TwitchApiService(private val httpClient: HttpClient) {
 
         val response = httpClient.get<StreamsResponse>(Endpoints.twitchStreamsUrl){
 
+            /*
+            Omitido y añadido en constructor de httpclient por defecto
             headers {
                 append("Authorization","Bearer $cursor")
                 append("Client-Id", OAuthConstants.clientId)
-            }
+            }*/
 
         }
 

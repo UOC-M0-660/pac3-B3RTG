@@ -2,6 +2,8 @@ package edu.uoc.pac3.data.network
 
 import android.content.Context
 import android.util.Log
+import edu.uoc.pac3.data.SessionManager
+import edu.uoc.pac3.data.oauth.OAuthConstants
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.HttpTimeout
@@ -12,6 +14,7 @@ import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.accept
+import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
@@ -57,10 +60,16 @@ object Network {
 
             // Apply to All Requests
             defaultRequest {
-                parameter("api_key", "some_api_key")
+                //parameter("api_key", "some_api_key")
                 // Content Type
                 if (this.method != HttpMethod.Get) contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
+
+                val bearerToken =  SessionManager(context).getAccessToken()
+                headers {
+                    append("Authorization","Bearer $bearerToken")
+                    append("Client-Id", OAuthConstants.clientId)
+                }
             }
             // Optional OkHttp Interceptors
             engine {
