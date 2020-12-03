@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import edu.uoc.pac3.R
@@ -17,10 +18,15 @@ class StreamsListAdapter(private var streams: List<Stream>) : RecyclerView.Adapt
         return streams[position]
     }
 
-    fun setStreams(streams: List<Stream>) {
-        this.streams = streams
+    fun setStreams(newStreams: List<Stream>) {
+
+        //val diffResult = DiffUtil.calculateDiff(StreamsDiffCallback(newStreams,this.streams))
+        //diffResult.dispatchUpdatesTo(this)
+
         // Reloads the RecyclerView with new adapter data
+        this.streams = newStreams
         notifyDataSetChanged()
+
     }
 
     // Returns total items in Adapter
