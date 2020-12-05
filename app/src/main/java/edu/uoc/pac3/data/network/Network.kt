@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import edu.uoc.pac3.data.SessionManager
 import edu.uoc.pac3.data.oauth.OAuthConstants
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.defaultRequest
 import io.ktor.client.features.json.JsonFeature
@@ -15,11 +15,13 @@ import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.accept
 import io.ktor.client.request.headers
-import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
+import okhttp3.Request
+import okhttp3.Response
 
 /**
  * Created by alex on 07/09/2020.
@@ -58,12 +60,18 @@ object Network {
                 socketTimeoutMillis = 15000L
             }
 
+            val sessionManager = SessionManager(context)
+            /*install(OAuthFeature) {
+                getToken = { sessionManager.getAccessToken().toString() }
+                refreshToken = { sessionManager.getRefreshToken() }
+            }*/
+
             // Apply to All Requests
             defaultRequest {
                 if (this.method != HttpMethod.Get) contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
 
-                val bearerToken =  SessionManager(context).getAccessToken()
+                val bearerToken =  sessionManager.getAccessToken()
                 headers {
                     append("Authorization","Bearer $bearerToken")
                     append("Client-Id", OAuthConstants.clientId)
@@ -71,9 +79,19 @@ object Network {
             }
             // Optional OkHttp Interceptors
             engine {
-                //addInterceptor(CurlInterceptor(Loggable { Log.v("Curl", it) }))
+                //addInterceptor()
+                //addInterceptor(CurlInterceptor())
             }
 
         }
     }
+}
+
+public class CurlInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        Log.d("Inteceptor", "Error $chain")
+        val request: Request = chain.request()
+        return chain.proceed(request)
+    }
+
 }

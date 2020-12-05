@@ -63,5 +63,10 @@ class SessionManager(private val context: Context) {
         }
     }
 
+    fun clearUserData() {
+        clearRefreshToken()
+        clearAccessToken()
+    }
+
 }
 

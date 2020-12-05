@@ -19,14 +19,10 @@ class StreamsListAdapter(private var streams: List<Stream>) : RecyclerView.Adapt
     }
 
     fun setStreams(newStreams: List<Stream>) {
-
-        val diffResult = DiffUtil.calculateDiff(StreamsDiffCallback(newStreams,this.streams))
-        diffResult.dispatchUpdatesTo(this)
-
-        // Reloads the RecyclerView with new adapter data
-        //this.streams = newStreams
-        //notifyDataSetChanged()
-
+            val oldStreams = this.streams
+            this.streams = newStreams
+            val diffResult = DiffUtil.calculateDiff(StreamsDiffCallback(this.streams,oldStreams))
+            diffResult.dispatchUpdatesTo(this)
     }
 
     // Returns total items in Adapter
@@ -47,7 +43,7 @@ class StreamsListAdapter(private var streams: List<Stream>) : RecyclerView.Adapt
         holder.titleView.text = stream.title
         holder.authorView.text = stream.userName
         val imageSize: String = R.dimen.stream_item_image_width_small.toString() + "x" + R.dimen.stream_item_image_height.toString()
-        Glide.with(holder.view).load(stream.thumbnailUrl?.replace("{width}x{height}",imageSize)).into(holder.thumbView);
+        Glide.with(holder.view).load(stream.thumbnailUrl?.replace("{width}x{height}",imageSize)).into(holder.thumbView)
     }
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {

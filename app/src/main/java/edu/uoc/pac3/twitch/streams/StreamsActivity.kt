@@ -1,7 +1,10 @@
 package edu.uoc.pac3.twitch.streams
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
@@ -11,6 +14,10 @@ import edu.uoc.pac3.R
 import edu.uoc.pac3.data.SessionManager
 import edu.uoc.pac3.data.TwitchApiService
 import edu.uoc.pac3.data.network.Network
+import edu.uoc.pac3.data.oauth.OAuthTokensResponse
+import edu.uoc.pac3.data.oauth.UnauthorizedException
+import edu.uoc.pac3.data.streams.StreamsResponse
+import edu.uoc.pac3.twitch.profile.ProfileActivity
 import kotlinx.coroutines.launch
 
 class StreamsActivity : AppCompatActivity() {
@@ -34,27 +41,46 @@ class StreamsActivity : AppCompatActivity() {
         getStreamData()
 
     }
-
     private fun getStreamData()
     {
-        val ts = TwitchApiService(Network.createHttpClient(this))
         val sm = SessionManager(this)
-
         lifecycleScope.launch {
             whenStarted {
+                try {
+                    var streams = getStreamDataAsync()
+                    cursor = streams?.pagination?.cursor!!
+                    Log.d(TAG, "Next currsor $cursor")
+                    Log.d(TAG, "Set streams to adapter")
+                    adapter.setStreams(streams?.data!!)
+                } catch (e: UnauthorizedException) {
+                    Log.d(TAG, "Unauthorized, Try refresh token")
+                    var response= getRefreshTokenAsync()
 
-                var streams = ts.getStreams(cursor)
-                cursor = streams?.pagination?.cursor!!
+                    sm.saveAccessToken(response.accessToken)
+                    sm.saveRefreshToken(response.refreshToken.toString())
+                    //Volver a pedir los streams
+                    var streams = getStreamDataAsync()
+                    cursor = streams?.pagination?.cursor!!
+                    adapter.setStreams(streams?.data!!)
+                }
 
-                Log.d(TAG, "Next currsor $cursor")
-                Log.d(TAG, "Set streams to adapter")
-                adapter.setStreams(streams?.data!!)
             }
         }
     }
 
+    private suspend fun getStreamDataAsync(): StreamsResponse? {
+        val ts = TwitchApiService(Network.createHttpClient(this))
+        val sm = SessionManager(this)
 
+        return ts.getStreams(cursor)
+    }
 
+    private suspend fun getRefreshTokenAsync(): OAuthTokensResponse {
+        val ts = TwitchApiService(Network.createHttpClient(this))
+        val sm = SessionManager(this)
+
+        return ts.refreshToken(sm.getRefreshToken().toString())
+    }
 
     private fun initRecyclerView() {
 
@@ -79,6 +105,23 @@ class StreamsActivity : AppCompatActivity() {
                 }*/
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_list, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.profile_item -> {
+                startActivity(Intent(this, ProfileActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }

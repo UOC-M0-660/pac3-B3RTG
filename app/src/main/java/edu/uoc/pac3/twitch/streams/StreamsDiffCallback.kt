@@ -18,7 +18,7 @@ class StreamsDiffCallback(internal var newStreamsList: List<Stream>, internal va
         val newObject = newStreamsList[newItemPosition]
         var itemsSame = false
 
-        if (oldObject.id.equals(newObject.userName, ignoreCase = true)) {
+        if (oldObject.id == newObject.id) {
             itemsSame = true
         }
         return itemsSame
