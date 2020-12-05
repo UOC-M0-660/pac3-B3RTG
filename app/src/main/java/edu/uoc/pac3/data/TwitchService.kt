@@ -54,7 +54,7 @@ class TwitchApiService(private val httpClient: HttpClient) {
     /// Gets Streams on Twitch
     @Throws(UnauthorizedException::class)
     suspend fun getStreams(cursor: String? = null): StreamsResponse? {
-        var response: StreamsResponse?
+        var response: StreamsResponse? = null
         try {
             response = httpClient.get<StreamsResponse>(Endpoints.twitchStreamsUrl) {
                 if (cursor != "") {
@@ -65,10 +65,12 @@ class TwitchApiService(private val httpClient: HttpClient) {
 
             Log.d(TAG, response.pagination?.cursor)
 
-        } catch (e: Exception)
+        } catch (e: UnauthorizedException)
         {
-            Log.d(TAG, e.toString())
+            Log.d(TAG, "Unautorized Exception ${e.toString()}")
             throw UnauthorizedException
+        } catch (e: Exception) {
+            Log.d(TAG, "Exception ${e.toString()}")
         }
         return response
     }
@@ -76,12 +78,20 @@ class TwitchApiService(private val httpClient: HttpClient) {
     /// Gets Current Authorized User on Twitch
     @Throws(UnauthorizedException::class)
     suspend fun getUser(): User? {
+        var response: UsersResponse? = null
 
-        val response = httpClient.get<UsersResponse>(Endpoints.twitchUserUrl){
-            // If neither a user ID nor a login name is specified, the user is looked up by Bearer token. Then we get the login user.
+        try {
+            response = httpClient.get<UsersResponse>(Endpoints.twitchUserUrl){
+                // If neither a user ID nor a login name is specified, the user is looked up by Bearer token. Then we get the login user.
+            }
+            Log.d(TAG, "User data: ${response.data}.")
+        }  catch (e: UnauthorizedException)
+        {
+            Log.d(TAG, "Unautorized Exception ${e.toString()}")
+            throw UnauthorizedException
+        } catch (e: Exception) {
+            Log.d(TAG, "Exception ${e.toString()}")
         }
-
-        Log.d(TAG, "UserName: ${response.data}.")
 
         return response?.data?.first()
     }
@@ -89,9 +99,18 @@ class TwitchApiService(private val httpClient: HttpClient) {
     /// Gets Current Authorized User on Twitch
     @Throws(UnauthorizedException::class)
     suspend fun updateUserDescription(description: String): User? {
-        val response = httpClient.put<UsersResponse>(Endpoints.twitchUserUrl){
-            //Updates the description of a user specified by a Bearer token. No parameters needed
-            parameter("description",description)
+        var response: UsersResponse? = null
+        try {
+            response = httpClient.put<UsersResponse>(Endpoints.twitchUserUrl){
+                //Updates the description of a user specified by a Bearer token. No parameters needed
+                parameter("description",description)
+            }
+        } catch (e: UnauthorizedException)
+        {
+            Log.d(TAG, "Unautorized Exception ${e.toString()}")
+            throw UnauthorizedException
+        } catch (e: Exception) {
+            Log.d(TAG, "Exception ${e.toString()}")
         }
 
         return response?.data?.first()

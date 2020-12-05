@@ -4,8 +4,10 @@ import android.content.Context
 import android.util.Log
 import edu.uoc.pac3.data.SessionManager
 import edu.uoc.pac3.data.oauth.OAuthConstants
+import edu.uoc.pac3.data.oauth.UnauthorizedException
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.features.HttpResponseValidator
 import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.defaultRequest
 import io.ktor.client.features.json.JsonFeature
@@ -77,6 +79,17 @@ object Network {
                     append("Client-Id", OAuthConstants.clientId)
                 }
             }
+
+            HttpResponseValidator {
+                validateResponse { response ->
+                    val statusCode= response.status.value
+                    when (statusCode)
+                    {
+                        401 -> throw UnauthorizedException
+                    }
+                }
+            }
+
             // Optional OkHttp Interceptors
             engine {
                 //addInterceptor()
