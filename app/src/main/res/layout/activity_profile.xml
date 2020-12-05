@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_medium"
             android:textColor="@color/colorOnBackground"
-            tools:text="Ibai" />
+            tools:text="" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
