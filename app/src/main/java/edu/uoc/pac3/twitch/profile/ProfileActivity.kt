@@ -46,13 +46,13 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun setupButtons() {
 
-        updateDescriptionButton.setOnClickListener { view ->
+        updateDescriptionButton.setOnClickListener {
            //do request
             lifecycleScope.launch {
                 whenStarted {
                     val description = userDescriptionEditText.text.toString()
                     val resultUserData = updateDescription(description)
-                    if(resultUserData != null && resultUserData?.description == description)
+                    if(resultUserData != null && resultUserData.description == description)
                     {
                         currentUser = resultUserData
                         Toast.makeText(applicationContext, getString(R.string.update_description_ok), Toast.LENGTH_SHORT).show()

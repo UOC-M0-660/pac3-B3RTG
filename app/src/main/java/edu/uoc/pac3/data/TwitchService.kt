@@ -63,7 +63,7 @@ class TwitchApiService(private val httpClient: HttpClient) {
                 }
             }
 
-            Log.d(TAG, response.pagination?.cursor)
+            Log.d(TAG, response.pagination?.cursor.toString())
 
         } catch (e: UnauthorizedException)
         {

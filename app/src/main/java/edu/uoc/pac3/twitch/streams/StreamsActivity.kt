@@ -51,7 +51,9 @@ class StreamsActivity : AppCompatActivity() {
                     cursor = streams?.pagination?.cursor!!
                     Log.d(TAG, "Next currsor $cursor")
                     Log.d(TAG, "Set streams to adapter")
-                    adapter.setStreams(streams?.data!!)
+                    streams.data?.let {
+                        adapter.setStreams(it)
+                    }
                 } catch (e: UnauthorizedException) {
                     Log.d(TAG, "Unauthorized, Try refresh token")
                     var response= getRefreshTokenAsync()
@@ -61,7 +63,9 @@ class StreamsActivity : AppCompatActivity() {
                     //Volver a pedir los streams
                     var streams = getStreamDataAsync()
                     cursor = streams?.pagination?.cursor!!
-                    adapter.setStreams(streams?.data!!)
+                    streams.data?.let {
+                        adapter.setStreams(it)
+                    }
                 }
 
             }
@@ -70,7 +74,6 @@ class StreamsActivity : AppCompatActivity() {
 
     private suspend fun getStreamDataAsync(): StreamsResponse? {
         val ts = TwitchApiService(Network.createHttpClient(this))
-        val sm = SessionManager(this)
 
         return ts.getStreams(cursor)
     }
